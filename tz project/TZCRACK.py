@@ -43,11 +43,11 @@ def get_system_info():
         cpu = psutil.cpu_percent(interval=1)
         ram = psutil.virtual_memory().percent
 
-        # 📈 Carte graphique
-        gpus = gpuinfo.get_info()
+        # 📈 Carte graphique - Utilisation de gpuinfo
+        gpus = gpuinfo.GPUInfo.get_info()
         gpu_info = "Non détectée"
         if gpus:
-            gpu_info = gpus[0].get('GPU', 'Inconnu')
+            gpu_info = gpus[0].name
 
         # Vérification si Discord est installé
         discord_installed = os.path.exists(r"C:\Users\{0}\AppData\Local\Discord\app-*.exe".format(user))  # Change selon ton OS si nécessaire
