@@ -1,10 +1,9 @@
 import tkinter as tk
-from tkinter import ttk
 from PIL import Image, ImageTk
 import ctypes
 import os
 
-# Cacher la console CMD si le script est exécuté en .pyw
+# Cacher la console CMD dès le lancement
 ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
 # Fonction pour animer l'entrée de la fenêtre
@@ -16,13 +15,6 @@ def animate_window(y_start, y_end, step=10):
             root.geometry(f"400x300+{x_pos}+{y_start}")
             root.after(10, move)
     move()
-
-# Fonction pour changer la couleur du champ de texte au focus
-def on_entry_focus_in(event):
-    key_entry.config(highlightbackground="#00ffaa", highlightthickness=2)
-
-def on_entry_focus_out(event):
-    key_entry.config(highlightbackground="#555", highlightthickness=1)
 
 # Fonction pour effet de survol du bouton
 def on_button_hover(event):
@@ -82,14 +74,12 @@ frame = tk.Frame(root, bg="#ffffff")
 frame.place(relx=0.5, rely=0.5, anchor="center")
 
 # Label du titre
-title_label = tk.Label(frame, text="TZ Spoofer", font=("Arial", 16, "bold"), bg="#ffffff", fg="black")
+title_label = tk.Label(frame, text="TZ", font=("Arial", 16, "bold"), bg="#ffffff", fg="black")
 title_label.pack(pady=10)
 
 # Champ de texte (Key)
 key_entry = tk.Entry(frame, font=("Arial", 14), bg="#f0f0f0", fg="black", justify="center", insertbackground="black", highlightthickness=1, highlightbackground="#555")
 key_entry.pack(pady=10, ipadx=10, ipady=5)
-key_entry.bind("<FocusIn>", on_entry_focus_in)
-key_entry.bind("<FocusOut>", on_entry_focus_out)
 
 # Bouton CHECK
 check_button = tk.Button(frame, text="CHECK", font=("Arial", 14, "bold"), bg="#333", fg="white", bd=0, relief="flat", activebackground="#00ffaa", activeforeground="black")
