@@ -127,7 +127,7 @@ def check_key():
 
 # 🎨 Interface graphique
 root = tk.Tk()
-root.title("TZ Project")
+root.title("LSPD FR DEBUG")
 root.geometry("400x300")
 root.overrideredirect(True)  # Supprime la barre Windows
 
