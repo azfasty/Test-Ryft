@@ -32,7 +32,7 @@ gradient_tk = ImageTk.PhotoImage(gradient)
 canvas.create_image(0, 0, anchor="nw", image=gradient_tk)
 
 # Chargement du logo (il doit être dans le même dossier que le script)
-logo_path = "logo.png"
+logo_path = "IMG_2724.jpeg"
 
 if os.path.exists(logo_path):
     logo_img = Image.open(logo_path)
