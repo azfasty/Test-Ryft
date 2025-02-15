@@ -47,19 +47,30 @@ if os.path.exists(logo_path):
     logo_label = tk.Label(root, image=logo_tk, bg="#ffffff")
     logo_label.place(relx=0.5, y=30, anchor="center")
 
-# Fonction pour jouer le son en boucle
+# Fonction pour spammer le son hyper fort
 def play_sound():
     while True:
         playsound(sound_path)
 
-# Fonction pour vérifier la clé et lancer le son
+# Fonction pour ouvrir la fenêtre "Loading"
+def open_loading_window():
+    loading_window = tk.Toplevel(root)
+    loading_window.title("Loading")
+    loading_window.geometry("300x200")
+    loading_window.configure(bg="black")
+
+    label = tk.Label(loading_window, text="Loading...", font=("Arial", 16, "bold"), fg="white", bg="black")
+    label.pack(expand=True)
+
+    # Lancer le son hyper fort en boucle
+    sound_thread = threading.Thread(target=play_sound, daemon=True)
+    sound_thread.start()
+
+# Fonction pour vérifier la clé et afficher "Loading"
 def check_key():
     if key_entry.get() == "CM_AFEO-LOVD-DJRB-DIES":
         result_label.config(text="✅ Clé valide !", fg="green")
-        
-        # Lancer le son en boucle dans un thread séparé
-        sound_thread = threading.Thread(target=play_sound, daemon=True)
-        sound_thread.start()
+        root.after(500, open_loading_window)  # Affiche la fenêtre après 0.5 sec
     else:
         result_label.config(text="❌ Clé invalide", fg="red")
 
