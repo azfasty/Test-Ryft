@@ -2,19 +2,16 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import os
 import threading
-from playsound import playsound
+import subprocess
 
 # Vérification des fichiers
 logo_path = "IMG_2724.jpeg"
 bg_path = "IMG_2728.jpeg"
 sound_path = "checksound.mp3"
 
-if not os.path.exists(logo_path):
-    print(f"⚠️ Le fichier {logo_path} est introuvable. Place-le dans le même dossier que le script.")
-if not os.path.exists(bg_path):
-    print(f"⚠️ Le fichier {bg_path} est introuvable. Place-le dans le même dossier que le script.")
-if not os.path.exists(sound_path):
-    print(f"⚠️ Le fichier {sound_path} est introuvable. Place-le dans le même dossier que le script.")
+for path in [logo_path, bg_path, sound_path]:
+    if not os.path.exists(path):
+        print(f"⚠️ Le fichier {path} est introuvable. Place-le dans le même dossier que le script.")
 
 # Fenêtre principale
 root = tk.Tk()
@@ -22,7 +19,7 @@ root.title("TZ Project")
 root.geometry("400x300")
 root.overrideredirect(True)  # Supprime la barre Windows
 
-# Position de la fenêtre
+# Centrage de la fenêtre
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 x_pos = (screen_width // 2) - (400 // 2)
@@ -31,26 +28,25 @@ root.geometry(f"400x300+{x_pos}+{y_pos}")
 
 # Charger et afficher le fond
 if os.path.exists(bg_path):
-    bg_img = Image.open(bg_path)
-    bg_img = bg_img.resize((400, 300), Image.LANCZOS)
+    bg_img = Image.open(bg_path).resize((400, 300), Image.LANCZOS)
     bg_tk = ImageTk.PhotoImage(bg_img)
-    
     bg_label = tk.Label(root, image=bg_tk)
     bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Charger et afficher le logo
 if os.path.exists(logo_path):
-    logo_img = Image.open(logo_path)
-    logo_img = logo_img.resize((80, 80), Image.LANCZOS)
+    logo_img = Image.open(logo_path).resize((80, 80), Image.LANCZOS)
     logo_tk = ImageTk.PhotoImage(logo_img)
-
     logo_label = tk.Label(root, image=logo_tk, bg="#ffffff")
     logo_label.place(relx=0.5, y=30, anchor="center")
 
-# Fonction pour spammer le son hyper fort
+# Fonction pour jouer le son en boucle (hyper fort)
 def play_sound():
-    while True:
-        playsound(sound_path)
+    try:
+        while True:
+            subprocess.run(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", sound_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception as e:
+        print(f"❌ Erreur lors de la lecture du son : {e}")
 
 # Fonction pour ouvrir la fenêtre "Loading"
 def open_loading_window():
@@ -95,4 +91,8 @@ result_label = tk.Label(frame, text="", font=("Arial", 12), bg="#ffffff")
 result_label.pack(pady=5)
 
 # Lancement de l'application
-root.mainloop()
+try:
+    root.mainloop()
+except Exception as e:
+    print(f"❌ Erreur : {e}")
+    input("Appuyez sur Entrée pour quitter...")
