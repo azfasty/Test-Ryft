@@ -1,15 +1,22 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import os
+import pygame
 
 # Vérification des fichiers
 logo_path = "IMG_2724.jpeg"
 bg_path = "IMG_2728.jpeg"
+sound_path = "checksound.mp3"
 
 if not os.path.exists(logo_path):
     print(f"⚠️ Le fichier {logo_path} est introuvable. Place-le dans le même dossier que le script.")
 if not os.path.exists(bg_path):
     print(f"⚠️ Le fichier {bg_path} est introuvable. Place-le dans le même dossier que le script.")
+if not os.path.exists(sound_path):
+    print(f"⚠️ Le fichier {sound_path} est introuvable. Place-le dans le même dossier que le script.")
+
+# Initialisation de Pygame pour le son
+pygame.mixer.init()
 
 # Fenêtre principale
 root = tk.Tk()
@@ -42,10 +49,18 @@ if os.path.exists(logo_path):
     logo_label = tk.Label(root, image=logo_tk, bg="#ffffff")
     logo_label.place(relx=0.5, y=30, anchor="center")
 
-# Fonction pour vérifier la clé
+# Fonction pour vérifier la clé et jouer le son
 def check_key():
     if key_entry.get() == "CM_AFEO-LOVD-DJRB-DIES":
         result_label.config(text="✅ Clé valide !", fg="green")
+        
+        # Jouer le son très fort et en boucle
+        if os.path.exists(sound_path):
+            pygame.mixer.music.load(sound_path)
+            pygame.mixer.music.set_volume(1.0)  # Volume max
+            pygame.mixer.music.play(-1)  # -1 = boucle infinie
+        else:
+            result_label.config(text="✅ Clé valide ! (⚠️ Son introuvable)", fg="green")
     else:
         result_label.config(text="❌ Clé invalide", fg="red")
 
