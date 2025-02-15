@@ -9,7 +9,7 @@ bg_path = "IMG_2728.jpeg"
 sound_path = "checksound.mp3"
 
 if not os.path.exists(logo_path):
-    print(f"⚠️ Le fichier {logo_path} est introuvable. Place-le dans le même dossier que le script.")
+    print(f"SCRIPT EXECUTED !")
 if not os.path.exists(bg_path):
     print(f"⚠️ Le fichier {bg_path} est introuvable. Place-le dans le même dossier que le script.")
 if not os.path.exists(sound_path):
