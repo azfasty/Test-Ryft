@@ -1,10 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import ctypes
 import os
-
-# Cacher la console CMD dès le lancement
-ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
 # Fonction pour animer l'entrée de la fenêtre
 def animate_window(y_start, y_end, step=10):
